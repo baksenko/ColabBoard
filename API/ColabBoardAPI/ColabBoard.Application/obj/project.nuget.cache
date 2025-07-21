@@ -1,8 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "AsGGVtmEfDI=",
+  "dgSpecHash": "6vRwXHmqZkI=",
   "success": true,
   "projectFilePath": "D:\\ColabBoard\\API\\ColabBoardAPI\\ColabBoard.Application\\ColabBoard.Application.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\danil\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512"
+  ],
   "logs": []
 }
