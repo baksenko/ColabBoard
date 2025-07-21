@@ -1,0 +1,26 @@
+﻿services:
+  colabboard.web:
+    image: colabboard.web
+    build:
+      context: .
+      dockerfile: ColabBoard.Web/Dockerfile
+    depends_on:
+      - postgresdb
+    
+
+  postgresdb:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: pisyapopakaka
+      POSTGRES_DB: ColabBoardDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+  
+volumes:
+  db_data:
+    

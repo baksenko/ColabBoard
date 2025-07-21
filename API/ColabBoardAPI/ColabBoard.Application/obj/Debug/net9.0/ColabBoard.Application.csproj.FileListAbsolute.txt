@@ -1,0 +1,15 @@
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\bin\Debug\net9.0\ColabBoard.Application.deps.json
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\bin\Debug\net9.0\ColabBoard.Application.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\bin\Debug\net9.0\ColabBoard.Application.pdb
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\bin\Debug\net9.0\ColabBoard.Domain.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\bin\Debug\net9.0\ColabBoard.Domain.pdb
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.csproj.AssemblyReference.cache
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.AssemblyInfoInputs.cache
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.AssemblyInfo.cs
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.csproj.CoreCompileInputs.cache
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoa.37EFB126.Up2Date
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\refint\ColabBoard.Application.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.pdb
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ref\ColabBoard.Application.dll

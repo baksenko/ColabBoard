@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "ColabBoard.Application/1.0.0": {
+        "dependencies": {
+          "ColabBoard.Domain": "1.0.0"
+        },
+        "runtime": {
+          "ColabBoard.Application.dll": {}
+        }
+      },
+      "ColabBoard.Domain/1.0.0": {
+        "runtime": {
+          "ColabBoard.Domain.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ColabBoard.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ColabBoard.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
