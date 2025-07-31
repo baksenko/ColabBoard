@@ -46,16 +46,11 @@ public class UsersRepository : IUsersRepository
          return users;
      }
      
-     public async Task<User> CreateUserAsync(CreateUserDto user)
+     public async Task<User> CreateUserAsync(User user)
      {
-         var _user = new User()
-         {
-             Username = user.Username,
-             HashedPassword = _hashingService.HashPassword(user.Password)
-         };
          
          var entityEntry = await _context.Set<User>()
-             .AddAsync(_user);
+             .AddAsync(user);
          
          var newUser = entityEntry.Entity;
          
