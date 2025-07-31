@@ -9,3 +9,4 @@ D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Domain\obj\Debug\net9.0\ColabBoard.Do
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Domain\obj\Debug\net9.0\refint\ColabBoard.Domain.dll
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Domain\obj\Debug\net9.0\ColabBoard.Domain.pdb
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Domain\obj\Debug\net9.0\ref\ColabBoard.Domain.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Domain\obj\Debug\net9.0\ColabBoard.Domain.sourcelink.json

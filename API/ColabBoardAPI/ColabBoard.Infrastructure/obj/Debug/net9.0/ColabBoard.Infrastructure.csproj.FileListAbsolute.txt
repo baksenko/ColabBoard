@@ -17,3 +17,4 @@ D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Infrastructure\obj\Debug\net9.0\refin
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Infrastructure\obj\Debug\net9.0\ColabBoard.Infrastructure.pdb
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Infrastructure\obj\Debug\net9.0\ColabBoard.Infrastructure.genruntimeconfig.cache
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Infrastructure\obj\Debug\net9.0\ref\ColabBoard.Infrastructure.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Infrastructure\obj\Debug\net9.0\ColabBoard.Infrastructure.sourcelink.json

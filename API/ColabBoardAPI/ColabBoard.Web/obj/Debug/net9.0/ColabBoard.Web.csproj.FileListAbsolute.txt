@@ -130,3 +130,8 @@ D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\ru\Microsoft.Cod
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\BCrypt.Net-Next.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\Microsoft.AspNetCore.Connections.Abstractions.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\Microsoft.AspNetCore.SignalR.Common.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\bin\Debug\net9.0\Microsoft.Extensions.Features.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Web\obj\Debug\net9.0\ColabBoard.Web.sourcelink.json

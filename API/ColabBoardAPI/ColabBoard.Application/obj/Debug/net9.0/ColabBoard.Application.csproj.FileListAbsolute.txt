@@ -13,3 +13,4 @@ D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoa
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\refint\ColabBoard.Application.dll
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.pdb
 D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ref\ColabBoard.Application.dll
+D:\ColabBoard\API\ColabBoardAPI\ColabBoard.Application\obj\Debug\net9.0\ColabBoard.Application.sourcelink.json
