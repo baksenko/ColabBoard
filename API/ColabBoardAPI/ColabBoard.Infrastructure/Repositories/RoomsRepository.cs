@@ -45,16 +45,10 @@ public class RoomsRepository : IRoomsRepository
         return rooms;
     }
      
-    public async Task<Room> CreateRoomAsync(CreateRoomDto room)
+    public async Task<Room> CreateRoomAsync(Room room)
     {
-        var _room = new Room()
-        {
-            Name = room.Name,
-            HashedPassword = _hashingService.HashPassword(room.Password)
-        };
-         
         var entityEntry = await _context.Set<Room>()
-            .AddAsync(_room);
+            .AddAsync(room);
          
         var newRoom = entityEntry.Entity;
          
@@ -72,8 +66,7 @@ public class RoomsRepository : IRoomsRepository
          
         return res;
     }
-
-    //TODO
+    
     public async Task<bool> DeleteRoomAsync(Guid id)
     {
         var deleted = await _context.Set<Room>()

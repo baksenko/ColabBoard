@@ -5,7 +5,7 @@ namespace ColabBoard.Application.Interfaces;
 
 public interface IRoomsRepository
 {
-    public Task<Room> CreateRoomAsync(CreateRoomDto room);
+    public Task<Room> CreateRoomAsync(Room room);
     
     public Task<Room?> GetRoomByIdAsync(Guid id);
     
