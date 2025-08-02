@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import './NewBoardForm.css';
 
 const NewBoardForm = ({ onCreate }) => {
   const [boardName, setBoardName] = useState("");

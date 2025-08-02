@@ -1,4 +1,5 @@
 import React from 'react';
+import './BoardList.css';
 
 const BoardList = ({ boards, onSelectBoard, onCreateBoard, onDeleteBoard }) => {
   const handleDeleteClick = (e, boardId, boardName) => {

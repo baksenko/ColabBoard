@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import './WhiteboardCanvas.css';
 
 const DEFAULT_THICKNESS = 3;
 const ERASER_THICKNESS = 24;
