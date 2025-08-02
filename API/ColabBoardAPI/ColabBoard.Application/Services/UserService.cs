@@ -21,7 +21,7 @@ public class UserService(IUsersRepository usersRepository, HashingService hashin
         var paswordhash = hashingService.HashPassword(userDto.Password);
         user.HashedPassword = paswordhash;
 
-        var newuser = await usersRepository.CreateUserAsync(user);
+         await usersRepository.CreateUserAsync(user);
     }
 
     public async Task<string> LoginAsync(string username, string password)
@@ -32,7 +32,7 @@ public class UserService(IUsersRepository usersRepository, HashingService hashin
             throw new Exception("User not found");
         }
 
-        if (hashingService.VerifyPassword(user.HashedPassword, password))
+        if (hashingService.VerifyPassword(password, user.HashedPassword))
         {
             return authenticationService.GenerateJwtToken(user);
         }

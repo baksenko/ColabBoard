@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ColabBoard.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+399489a0d5220d881c99991e52cfb982194cafd6")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ce27397f00954f4438ee611a5221f30658b956b6")]
 [assembly: System.Reflection.AssemblyProductAttribute("ColabBoard.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ColabBoard.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

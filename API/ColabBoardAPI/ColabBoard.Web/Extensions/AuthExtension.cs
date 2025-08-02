@@ -11,6 +11,11 @@ public static class AuthExtension
     {
         var settings = configuration.GetSection("AuthSettings").Get<AuthSettings>();
 
+        if (settings == null || string.IsNullOrEmpty(settings.SecretKey))
+        {
+            throw new InvalidOperationException("AuthSettings:SecretKey не настроен в конфигурации приложения");
+        }
+
         serviceCollection.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -20,7 +25,7 @@ public static class AuthExtension
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.Secret))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings.SecretKey))
                 };
             });
 

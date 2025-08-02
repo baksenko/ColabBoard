@@ -21,7 +21,7 @@ public class AuthenticationService(IOptions<AuthSettings> authSettings)
             expires: DateTime.UtcNow.Add(authSettings.Value.TokenExpiration),
             claims: claims,
             signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.Value.Secret)),
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authSettings.Value.SecretKey)),
                 SecurityAlgorithms.HmacSha256Signature)
         );
         
