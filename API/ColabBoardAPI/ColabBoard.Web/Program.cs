@@ -4,12 +4,14 @@ using ColabBoard.Application.Services;
 using ColabBoard.Infrastructure.Data;
 using ColabBoard.Infrastructure.Repositories;
 using ColabBoard.Web.Extensions;
+using ColabBoard.Web.Hubs;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("postgres")));
@@ -19,6 +21,7 @@ builder.Services.AddScoped<IStrokesRepository, StrokesRepository>();
 builder.Services.AddSingleton<HashingService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddSingleton<AuthenticationService>();
+builder.Services.AddScoped<RoomService>();
 builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
 builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddSignalR();
@@ -35,6 +38,7 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 
+app.MapHub<WhiteBoardHub>("board");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

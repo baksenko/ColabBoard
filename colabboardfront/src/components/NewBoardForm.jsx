@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import './NewBoardForm.css';
 
-const NewBoardForm = ({ onCreate }) => {
+const NewBoardForm = ({ onCreate, onCancel }) => {
   const [boardName, setBoardName] = useState("");
   const [password, setPassword] = useState("");
 
@@ -16,6 +16,14 @@ const NewBoardForm = ({ onCreate }) => {
 
   return (
     <div className="NewBoardForm">
+      <button 
+        className="cancel-button-x" 
+        onClick={onCancel}
+        type="button"
+        aria-label="Close form"
+      >
+        ×
+      </button>
       <h2>Create New Whiteboard</h2>
       
       <form onSubmit={handleSubmit}>

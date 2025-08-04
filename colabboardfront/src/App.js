@@ -95,6 +95,12 @@ function App() {
     setShowLogin(true);
   };
 
+  const handleCancelAuth = () => {
+    // For auth forms, we could either close the app or show a message
+    // For now, we'll just prevent the cancel action since users need to authenticate
+    console.log('Auth cancel clicked - authentication required');
+  };
+
   // Check for existing JWT token on app load
   useEffect(() => {
     const token = localStorage.getItem('jwt_token');
@@ -131,11 +137,13 @@ function App() {
             <LoginPanel 
               onLogin={handleLogin}
               onSwitchToRegister={switchToRegister}
+              onCancel={handleCancelAuth}
             />
           ) : (
             <RegisterPanel 
               onRegister={handleRegister}
               onSwitchToLogin={switchToLogin}
+              onCancel={handleCancelAuth}
             />
           )
         ) : !selectedBoard && !showNewBoardForm ? (
@@ -149,15 +157,8 @@ function App() {
           <div style={{ width: '100%', maxWidth: 600 }}>
             <NewBoardForm 
               onCreate={handleNewBoardSubmit}
+              onCancel={handleCancelNewBoard}
             />
-            <div className="cancel-container">
-              <button 
-                className="cancel-button"
-                onClick={handleCancelNewBoard}
-              >
-                Cancel
-              </button>
-            </div>
           </div>
         ) : (
           <div className="WhiteboardContainer">

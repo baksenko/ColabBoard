@@ -13,8 +13,8 @@ public class AuthenticationService(IOptions<AuthSettings> authSettings)
     {
         var claims = new List<Claim>
         {
-            new Claim("username", user.Username),
-            new Claim("id", user.Id.ToString())
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString())
         };
 
         var token = new JwtSecurityToken(

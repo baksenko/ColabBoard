@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './RegisterPanel.css';
 
-const RegisterPanel = ({ onRegister, onSwitchToLogin }) => {
+const RegisterPanel = ({ onRegister, onSwitchToLogin, onCancel }) => {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -112,6 +112,14 @@ const RegisterPanel = ({ onRegister, onSwitchToLogin }) => {
   return (
     <div className="auth-panel">
       <div className="auth-container">
+        <button 
+          className="cancel-button-x" 
+          onClick={onCancel}
+          type="button"
+          aria-label="Close form"
+        >
+          ×
+        </button>
         <h2>Create Account</h2>
         <p className="auth-subtitle">Join ColabBoard to start collaborating</p>
         

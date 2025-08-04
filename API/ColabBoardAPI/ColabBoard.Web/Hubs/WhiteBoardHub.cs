@@ -1,4 +1,5 @@
-﻿using ColabBoard.Application.Interfaces;
+﻿using ColabBoard.Application.DTOs;
+using ColabBoard.Application.Interfaces;
 using ColabBoard.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -6,16 +7,13 @@ using Microsoft.AspNetCore.SignalR;
 namespace ColabBoard.Web.Hubs;
 
 [Authorize]
-public class WhiteBoardHub : Hub
+public class WhiteBoardHub(IStrokesRepository strokesRepository, IRoomsRepository roomsRepository) : Hub
 {
-    IStrokesRepository _strokesRepository;
-
-    public WhiteBoardHub(IStrokesRepository strokesRepository)
+    public async Task SendStroke(Guid boardId, CreateStrokeDto stroke)
     {
-        _strokesRepository = strokesRepository;
-    }
-    public async Task SendStroke(Guid BoardId, Stroke stroke)
-    {
+        var room = await roomsRepository.GetRoomByIdAsync(boardId);
+        
+        strokesRepository.
         await Clients.Group(BoardId.ToString()).SendAsync("ReceoveStroke", stroke);
     }
     
