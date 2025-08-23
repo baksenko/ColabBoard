@@ -4,168 +4,182 @@ import './WhiteboardCanvas.css';
 const DEFAULT_THICKNESS = 3;
 const ERASER_THICKNESS = 24;
 
-function lineIntersects(a, b, c, d, threshold = 8) {
+const COLORS = ['#1d29b5ff', '#e42e2eff', '#17b978', '#ff9d14ff', '#6a4cff', '#000'];
 
-  const minX = Math.min(a.x, b.x) - threshold;
-  const maxX = Math.max(a.x, b.x) + threshold;
-  const minY = Math.min(a.y, b.y) - threshold;
-  const maxY = Math.max(a.y, b.y) + threshold;
-  const cIn = c.x >= minX && c.x <= maxX && c.y >= minY && c.y <= maxY;
-  const dIn = d.x >= minX && d.x <= maxX && d.y >= minY && d.y <= maxY;
-  return cIn || dIn;
-}
-
-const WhiteboardCanvas = ({ strokes, onDraw, color = '#2d3a4b', isErasing = false }) => {
+const WhiteboardCanvas = ({ClearStrokes, board, onDraw, onLeave }) => {
   const canvasRef = useRef(null);
-  const [drawing, setDrawing] = useState(false);
-  const [currentPoints, setCurrentPoints] = useState([]);
+  const ctxRef = useRef(null);
+  const drawingRef = useRef(false);
+  const lastPointRef = useRef(null);
+
+  const [color, setColor] = useState(COLORS[0]);
+  const [isErasing, setIsErasing] = useState(false);
+  const [size, setSize] = useState(DEFAULT_THICKNESS);
+  const [currentStroke, setCurrentStroke] = useState([]);
+
+  const endDraw = () => {
+    if (!drawingRef.current) return;
+    drawingRef.current = false;
+    ctxRef.current.closePath();
+
+    ctxRef.current.globalCompositeOperation = 'source-over';
+    
+    if (currentStroke.length > 0) {
+      console.log({ points: currentStroke, color, size, isErasing, room_id: board.id });
+      onDraw && onDraw({ points: currentStroke, color, size, isErasing, roomid: board.id });
+      setCurrentStroke([]);
+    }
+      
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    strokes.forEach(stroke => {
-      ctx.strokeStyle = stroke.color;
-      ctx.lineWidth = stroke.thickness;
-      ctx.beginPath();
-      stroke.points.forEach((pt, idx) => {
-        if (idx === 0) ctx.moveTo(pt.x, pt.y);
-        else ctx.lineTo(pt.x, pt.y);
-      });
-      ctx.stroke();
-    });
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctxRef.current = ctx;
+  }, []);
 
-    if (drawing && currentPoints.length > 0) {
-      ctx.strokeStyle = isErasing ? '#fff' : color;
-      ctx.lineWidth = isErasing ? ERASER_THICKNESS : DEFAULT_THICKNESS;
-      ctx.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
-      ctx.beginPath();
-      currentPoints.forEach((pt, idx) => {
-        if (idx === 0) ctx.moveTo(pt.x, pt.y);
-        else ctx.lineTo(pt.x, pt.y);
-      });
-      ctx.stroke();
-      ctx.globalCompositeOperation = 'source-over';
+
+  useEffect(() => {
+  if (!ctxRef.current) return;
+
+  const canvas = canvasRef.current;
+  const ctx = ctxRef.current;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  board.strokes.forEach(stroke => {
+    const pts = (stroke.points || []).slice()
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+
+    if (pts.length < 2) return;
+
+    ctx.beginPath();
+    ctx.lineWidth = stroke.isErasing ? ERASER_THICKNESS : stroke.size;
+    ctx.strokeStyle = stroke.isErasing ? "#fff" : stroke.color;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.globalCompositeOperation = stroke.isErasing ? 'destination-out' : 'source-over';
+
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(pts[i].x, pts[i].y);
     }
-  }, [strokes, drawing, currentPoints, color, isErasing]);
+    ctx.stroke();
+    ctx.closePath();
+  });
 
-  const getCanvasPos = (e) => {
+  ctx.globalCompositeOperation = 'source-over';
+}, [board.strokes]);
+
+
+  const getPos = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
+    if (e.touches) {
+      return {
+        x: e.touches[0].clientX - rect.left,
+        y: e.touches[0].clientY - rect.top,
+      };
+    }
     return {
-      x: (e.clientX - rect.left) * (canvasRef.current.width / rect.width),
-      y: (e.clientY - rect.top) * (canvasRef.current.height / rect.height),
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     };
   };
 
-  const handleMouseDown = (e) => {
-    setDrawing(true);
-    setCurrentPoints([getCanvasPos(e)]);
+  const startDraw = (pos) => {
+    drawingRef.current = true;
+    lastPointRef.current = pos;
+    ctxRef.current.beginPath();
+    ctxRef.current.moveTo(pos.x, pos.y);
+    setCurrentStroke([{ x: pos.x, y: pos.y }]);
   };
 
-  const handleMouseMove = (e) => {
-    if (!drawing) return;
-    setCurrentPoints(points => [...points, getCanvasPos(e)]);
+  const draw = (pos) => {
+    if (!drawingRef.current) return;
+    ctxRef.current.lineWidth = isErasing ? ERASER_THICKNESS : size;
+    ctxRef.current.globalCompositeOperation = isErasing ? 'destination-out' : 'source-over';
+    ctxRef.current.strokeStyle = color;
+    ctxRef.current.lineTo(pos.x, pos.y);
+    ctxRef.current.stroke();
+    lastPointRef.current = pos;
+    setCurrentStroke(prev => [...prev, { x: pos.x, y: pos.y }]);
   };
 
-  const handleMouseUp = () => {
-    if (!drawing || currentPoints.length < 2) {
-      setDrawing(false);
-      setCurrentPoints([]);
-      return;
-    }
-    if (isErasing) {
-
-      const eraseIds = [];
-      for (const stroke of strokes) {
-        for (let i = 1; i < stroke.points.length; i++) {
-          for (let j = 1; j < currentPoints.length; j++) {
-            if (lineIntersects(stroke.points[i-1], stroke.points[i], currentPoints[j-1], currentPoints[j], ERASER_THICKNESS/2)) {
-              eraseIds.push(stroke.id);
-              break;
-            }
-          }
-          if (eraseIds.includes(stroke.id)) break;
-        }
-      }
-      onDraw(null, eraseIds);
-    } else {
-      onDraw({
-        color,
-        thickness: DEFAULT_THICKNESS,
-        points: currentPoints,
-        id: Date.now(),
-      });
-    }
-    setDrawing(false);
-    setCurrentPoints([]);
+  const clearAll = () => {
+    ctxRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    ClearStrokes(board.id);
   };
 
-  const getTouchPos = (touch) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    return {
-      x: (touch.clientX - rect.left) * (canvasRef.current.width / rect.width),
-      y: (touch.clientY - rect.top) * (canvasRef.current.height / rect.height),
-    };
-  };
+  const handleMouseDown = (e) => startDraw(getPos(e));
+  const handleMouseMove = (e) => draw(getPos(e));
+  const handleMouseUp = () => endDraw();
 
-  const handleTouchStart = (e) => {
-    if (e.touches.length !== 1) return;
-    setDrawing(true);
-    setCurrentPoints([getTouchPos(e.touches[0])]);
-  };
-
-  const handleTouchMove = (e) => {
-    if (!drawing || e.touches.length !== 1) return;
-    setCurrentPoints(points => [...points, getTouchPos(e.touches[0])]);
-  };
-
-  const handleTouchEnd = () => {
-    if (!drawing || currentPoints.length < 2) {
-      setDrawing(false);
-      setCurrentPoints([]);
-      return;
-    }
-    if (isErasing) {
-      const eraseIds = [];
-      for (const stroke of strokes) {
-        for (let i = 1; i < stroke.points.length; i++) {
-          for (let j = 1; j < currentPoints.length; j++) {
-            if (lineIntersects(stroke.points[i-1], stroke.points[i], currentPoints[j-1], currentPoints[j], ERASER_THICKNESS/2)) {
-              eraseIds.push(stroke.id);
-              break;
-            }
-          }
-          if (eraseIds.includes(stroke.id)) break;
-        }
-      }
-      onDraw(null, eraseIds);
-    } else {
-      onDraw({
-        color,
-        thickness: DEFAULT_THICKNESS,
-        points: currentPoints,
-        id: Date.now(),
-      });
-    }
-    setDrawing(false);
-    setCurrentPoints([]);
-  };
+  const handleTouchStart = (e) => startDraw(getPos(e));
+  const handleTouchMove = (e) => draw(getPos(e));
+  const handleTouchEnd = () => endDraw();
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={800}
-      height={600}
-      className="whiteboard-canvas"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    />
+    <>
+      <div className="WhiteboardContainer">
+        <button className="back-button" onClick={onLeave}>Back to Boards</button>
+        <div className="controls">
+          <span className="color-label">Color:</span>
+          {COLORS.map(c => (
+            <button
+              key={c}
+              className={`color-button ${color === c ? 'active' : ''}`}
+              style={{ '--color': c }}
+              onClick={() => { setColor(c); setIsErasing(false); }}
+              aria-label={`Pick color ${c}`}
+            />
+          ))}
+          <input
+            type="color"
+            value={color}
+            onChange={(e) => { setColor(e.target.value); setIsErasing(false); }}
+            aria-label="Custom color picker"
+          />
+          <button
+            className={`eraser-button ${isErasing ? 'active' : ''}`}
+            onClick={() => setIsErasing(e => !e)}
+          >
+            {isErasing ? 'Erasing' : 'Eraser'}
+          </button>
+          <input
+            type="range"
+            min={1}
+            max={60}
+            value={size}
+            onChange={(e) => setSize(Number(e.target.value))}
+          />
+          <button onClick={clearAll} className="clear-button">Clear All</button>
+        </div>
+
+        <canvas
+          ref={canvasRef}
+          width={1000}
+          height={600}
+          className="whiteboard-canvas"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        />
+      </div>
+      <ul>
+        {board.users.map((user, idx) => (
+          <li key={idx} className="user-item">
+            <span className="user-name">{user}</span>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 
-export default WhiteboardCanvas; 
+export default WhiteboardCanvas;

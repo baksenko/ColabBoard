@@ -1,6 +1,5 @@
-﻿using ColabBoard.Domain.Enums;
-
+﻿using ColabBoard.Domain.Entities;
 
 namespace ColabBoard.Application.DTOs;
 
-public record CreateStrokeDto(int x, int y, Colors color, Guid room_id);
+public record CreateStrokeDto(List<Point> Points, string Color, Guid Roomid, int Size, bool IsErasing);

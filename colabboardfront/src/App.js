@@ -1,197 +1,242 @@
-import React, { useState, useEffect } from 'react';
-import BoardList from './components/BoardList';
-import NewBoardForm from './components/NewBoardForm';
-import WhiteboardCanvas from './components/WhiteboardCanvas';
-import LoginPanel from './components/LoginPanel';
-import RegisterPanel from './components/RegisterPanel';
-import './App.css';
+import React from "react";
+import "./App.css";
+import BoardList from "./components/BoardList";
+import RegisterPanel from "./components/RegisterPanel";
+import LoginPanel from "./components/LoginPanel";
+import NewBoardForm from "./components/NewBoardForm";
+import JoinBoardForm from "./components/JoinBoardForm";
+import WhiteboardCanvas from "./components/WhiteboardCanvas";
+import * as signalR from '@microsoft/signalr';
 
-const COLORS = ['#1d29b5ff', '#e42e2eff', '#17b978', '#ff9d14ff', '#6a4cff', '#fff', '#000'];
+export default function App() {
 
-function App() {
-  const [boards, setBoards] = useState([]);
-  const [selectedBoard, setSelectedBoard] = useState(null);
-  const [strokes, setStrokes] = useState([]);
-  const [color, setColor] = useState(COLORS[0]);
-  const [isErasing, setIsErasing] = useState(false);
-  const [showNewBoardForm, setShowNewBoardForm] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [showLogin, setShowLogin] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [connection, setConnection] = React.useState(null);
+  const [boards, setBoards] = React.useState([]);
+  const [user, setUser] = React.useState(null);
+  const [authenticated, setAuthenticated] = React.useState(false);
+  const [showLoginPanel, setShowLoginPanel] = React.useState(true);
+  const [showBoardPanel, setShowBoardPanel] = React.useState(false);
+  const [showJoinBoardForm, setShowJoinBoardForm] = React.useState(false);
+  const [showBoard, setShowBoard] = React.useState(false);
+  const [board, setBoard] = React.useState({
+        id: null,
+        name: null,
+        users: [],
+        strokes: []
+      });
+  const [showBoardList, setShowBoardList] = React.useState(true);
 
-  const handleSelectBoard = (board) => {
-    setSelectedBoard(board);
-    setStrokes([]);
-  };
-
-  const handleCreateBoard = () => {
-    setShowNewBoardForm(true);
-  };
-
-  const handleNewBoardSubmit = (boardData) => {
-    const newBoard = {
-      id: Date.now().toString(),
-      name: boardData.boardName,
-      password: boardData.password,
-    };
-    setBoards([...boards, newBoard]);
-    setSelectedBoard(newBoard);
-    setStrokes([]);
-    setShowNewBoardForm(false);
-  };
-
-  const handleCancelNewBoard = () => {
-    setShowNewBoardForm(false);
-  };
-
-  const handleDeleteBoard = (boardId) => {
-    setBoards(boards.filter(board => board.id !== boardId));
-    if (selectedBoard && selectedBoard.id === boardId) {
-      setSelectedBoard(null);
-      setStrokes([]);
+  const handleDraw = async (stroke) => {
+    if (connection) {
+      await connection.invoke("SendStroke", stroke);
     }
   };
 
-  const handleDraw = (stroke, eraseIds) => {
-    if (isErasing && eraseIds && eraseIds.length > 0) {
-      setStrokes(strokes.filter(s => !eraseIds.includes(s.id)));
-    } else if (!isErasing && stroke) {
-      setStrokes([...strokes, stroke]);
-    }
-  };
+  async function joinBoard(boardId) {
+    const token = localStorage.getItem("jwt_token");
 
-  const handleLogin = (loginData) => {
-    // Store user data and token
-    setCurrentUser({ 
-      username: loginData.username, 
-      name: loginData.username,
-      token: loginData.token 
+    const connection = new signalR.HubConnectionBuilder()
+      .withUrl(`http://localhost:8080/whiteboardHub?boardId=${boardId}`, {
+        accessTokenFactory: () => token
+      })
+      .withAutomaticReconnect()
+      .build();
+
+      
+      connection.on("ReceiveStroke", onStrokeReceived);
+      connection.on("RemoveStrokes", removeStrokes);
+
+    try{
+      await connection.start();
+      console.log(connection);
+      setConnection(connection);
+    } catch (error) {
+      console.error("Error starting connection:", error);
+    }
+  }
+  
+  const onLeaveCanvas = () => {
+    if (connection) {
+      connection.stop();
+      connection.off("ReceiveStroke", onStrokeReceived);
+    }
+    setBoard({
+      id: null,
+      name: null,
+      users: [],
+      strokes: []
     });
-    setIsAuthenticated(true);
-    setShowLogin(true);
+    setShowBoard(false);
+    setShowBoardList(true);
   };
 
-  const handleRegister = (registerData) => {
-    // In a real app, you would send this to your backend
-    setCurrentUser({ username: registerData.username, name: registerData.username });
-    setIsAuthenticated(true);
-    setShowLogin(true);
+   function onStrokeReceived(stroke) {
+    setBoard(prevBoard => ({
+      ...prevBoard,
+      strokes: [...prevBoard.strokes, stroke]
+    }));
+  }
+
+  const removeStrokes = () => {
+    setBoard(prevBoard => ({
+      ...prevBoard,
+      strokes: []
+    }));
   };
+
+  const handleBoardSelect = (boardId) => {
+    loadboardinfo(boardId);
+    joinBoard(boardId);
+    setShowBoard(true);
+    setShowBoardList(false);
+  }
+
+  const loadboardinfo = async (boardId) => {
+    const response = await fetch(`http://localhost:8080/Board/GetBoardById/${boardId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('strokes:', data.strokes);
+      console.log('id:', data.id);
+      setBoard({
+        id: data.id,
+        name: data.name,
+        users: data.userNames || [],
+        strokes: data.strokes || []
+      });
+      console.log('Board loaded:', board.strokes);
+      console.log('Users:', board.users);
+    } else {
+      console.error('Failed to load board info');
+    }
+  }
+
+  const clearBoard = (boardId) => {
+    connection.invoke("ClearBoard", boardId);
+  };
+
+  const loadboards = async () => {
+    const response = await fetch('http://localhost:8080/Board', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setBoards(data.map(board => ({ Name: board.name, Id: board.id })) || []);
+    } else {
+      console.error('Failed to load boards');
+    }
+  }
+
+  const onJoinBoard = (newBoard) => {
+    setBoards([...boards, newBoard]);
+    setShowJoinBoardForm(false);
+  }
+
 
   const handleLogout = () => {
-    localStorage.removeItem('jwt_token');
-    setIsAuthenticated(false);
-    setCurrentUser(null);
-    setSelectedBoard(null);
-    setStrokes([]);
-    setBoards([]);
+    localStorage.removeItem("jwt-token");
+    setUser(null);
+    setAuthenticated(false);
   };
 
-  const switchToRegister = () => {
-    setShowLogin(false);
+  const handleUserLogin = (userData) => {
+    setUser({ username: userData.username });
+    loadboards();
+    setAuthenticated(true);
   };
 
-  const switchToLogin = () => {
-    setShowLogin(true);
+  const handleUserRegistration = () => {
+    setShowLoginPanel(true);
   };
 
-  const handleCancelAuth = () => {
-    // For auth forms, we could either close the app or show a message
-    // For now, we'll just prevent the cancel action since users need to authenticate
-    console.log('Auth cancel clicked - authentication required');
-  };
+  const onCreateBoard = (newBoard) => {
+    setBoards([...boards, newBoard]);
+    setShowBoardPanel(false);
+  }
 
-  // Check for existing JWT token on app load
-  useEffect(() => {
+  const onDeleteBoard = async (boardId) => {
+    setBoards(boards.filter(board => board.Id !== boardId));
+  }
+
+  React.useEffect(() => { 
+    async function fetchData() {
     const token = localStorage.getItem('jwt_token');
     if (token) {
-      // You could validate the token with your backend here
-      // For now, we'll assume the token is valid
-      setIsAuthenticated(true);
-      // You might want to decode the JWT to get user info
-      // For now, we'll set a placeholder
-      setCurrentUser({ 
-        username: 'User', 
-        name: 'User',
-        token: token 
+      const response = await fetch('http://localhost:8080/Auth', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
       });
+
+      if(!response.ok) {
+        console.error('Failed to authenticate');
+        return;
+      }
+
+      const data = await response.json();
+      setUser({
+        username: data.userName
+      });
+      setAuthenticated(true);
+      loadboards();
     }
+  }
+
+  fetchData();
   }, []);
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="app">
+       <header className="App-header">
         <h1>ColabBoard</h1>
-        {isAuthenticated && currentUser && (
+        {authenticated && user && (
           <div className="user-info">
-            <span>{currentUser.username}</span>
+            <span>{user.username}</span>
             <button className="logout-button" onClick={handleLogout}>
               Logout
             </button>
           </div>
         )}
       </header>
-      <main style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: 24 }}>
-        {!isAuthenticated ? (
-          showLogin ? (
-            <LoginPanel 
-              onLogin={handleLogin}
-              onSwitchToRegister={switchToRegister}
-              onCancel={handleCancelAuth}
-            />
-          ) : (
-            <RegisterPanel 
-              onRegister={handleRegister}
-              onSwitchToLogin={switchToLogin}
-              onCancel={handleCancelAuth}
-            />
-          )
-        ) : !selectedBoard && !showNewBoardForm ? (
-          <BoardList
-            boards={boards}
-            onSelectBoard={handleSelectBoard}
-            onCreateBoard={handleCreateBoard}
-            onDeleteBoard={handleDeleteBoard}
-          />
-        ) : showNewBoardForm ? (
-          <div style={{ width: '100%', maxWidth: 600 }}>
-            <NewBoardForm 
-              onCreate={handleNewBoardSubmit}
-              onCancel={handleCancelNewBoard}
-            />
-          </div>
-        ) : (
-          <div className="WhiteboardContainer">
-            <button className="back-button" onClick={() => setSelectedBoard(null)}>Back to Boards</button>
-            <div className="controls">
-              <span className="color-label">Color:</span>
-              {COLORS.map(c => (
-                <button
-                  key={c}
-                  className={`color-button ${color === c ? 'active' : ''}`}
-                  style={{ '--color': c }}
-                  onClick={() => { setColor(c); setIsErasing(false); }}
-                  aria-label={`Pick color ${c}`}
-                />
-              ))}
-              <button
-                className={`eraser-button ${isErasing ? 'active' : ''}`}
-                onClick={() => setIsErasing(e => !e)}
-              >
-                {isErasing ? 'Erasing' : 'Eraser'}
-              </button>
-            </div>
-            <WhiteboardCanvas
-              strokes={strokes}
-              onDraw={handleDraw}
-              color={color}
-              isErasing={isErasing}
-            />
-          </div>
-        )}
-      </main>
-    </div>
-  );
+    <main style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: 24 }}>
+    {authenticated ? (
+      <>
+      {showJoinBoardForm && <JoinBoardForm onJoin={onJoinBoard} onCancel={() => {setShowJoinBoardForm(false); setShowBoardList(true)}} />}
+      {showBoardPanel &&  <NewBoardForm onCreate={onCreateBoard} onCancel={() => {setShowBoardPanel(false); setShowBoardList(true)}} />}
+      {showBoardList && <BoardList boards={boards}
+        onSelectBoard={handleBoardSelect}
+        onCreateBoard={() => {setShowBoardPanel(true); setShowBoardList(false)}}
+        onDeleteBoard={onDeleteBoard}
+        onJoinBoard={() => {setShowJoinBoardForm(true); setShowBoardList(false);}} />}
+      {showBoard && <WhiteboardCanvas 
+      ClearStrokes={clearBoard}
+      board={board}
+      onDraw={handleDraw}
+      onLeave={onLeaveCanvas}
+      />}
+      </>
+    ) : (
+      showLoginPanel ? (
+          <LoginPanel onLogin={handleUserLogin} onSwitchToRegister={() => setShowLoginPanel(false)} />
+        ) :(
+          <RegisterPanel onRegister={handleUserRegistration} onSwitchToLogin={() => setShowLoginPanel(true)} />
+        )
+      )
+    }
+  </main>
+  </div>
+);
 }
-
-export default App;

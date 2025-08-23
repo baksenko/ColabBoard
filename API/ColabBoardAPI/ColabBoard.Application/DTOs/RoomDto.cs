@@ -2,4 +2,4 @@
 
 namespace ColabBoard.Application.DTOs;
 
-public record RoomDto(string Name, List<User> users, List<Stroke> strokes, Guid head_id);
+public record RoomDto(Guid id, string Name, List<string> userNames, List<strokeDTO> strokes);

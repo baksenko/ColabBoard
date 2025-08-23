@@ -11,28 +11,20 @@ public class UsersRepository : IUsersRepository
 {
      
      private readonly AppDbContext _context;
-     
-     private readonly HashingService _hashingService;
+    
 
-     public UsersRepository(AppDbContext context, HashingService hashingService)
+     public UsersRepository(AppDbContext context)
      {
           _context = context;
-          _hashingService = hashingService;
      }
-     
-     public async Task<User?> GetUserByIdAsync(Guid id)
-     {
-         return  await _context.Set<User>()
-               .AsNoTracking()
-               .Where(x => x.Id == id)
-               .FirstOrDefaultAsync();
-     }
+    
 
      public async Task<User?> GetUserByUserNameAsync(string username)
      {
-         return  await _context.Set<User>()
+         return await _context.Set<User>()
              .AsNoTracking()
              .Where(x => x.Username == username)
+             .Include(x => x.Rooms)
              .FirstOrDefaultAsync();
          
      }
@@ -77,4 +69,14 @@ public class UsersRepository : IUsersRepository
 
          return deleted > 0;
      }
+
+     public async Task<User?> GetUserByIdAsync(Guid id)
+     {
+         return await _context.Set<User>()
+             .AsNoTracking()
+             .Where(x => x.Id == id)
+             .Include(x => x.Rooms)
+             .FirstOrDefaultAsync();
+     }
+     
 }

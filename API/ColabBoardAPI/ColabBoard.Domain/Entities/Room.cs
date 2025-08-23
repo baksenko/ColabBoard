@@ -13,9 +13,6 @@ public class Room : BaseEntity
     [Required]
     public string HashedPassword { get; set; }
     
-    [Required]
-    public Guid HeadID { get; set; }
-    
     public List<Stroke> Strokes { get; set; }
     
 }

@@ -113,3 +113,19 @@
 .BoardList .create-button:hover {
   background: #0056b3;
 } 
+
+.BoardList .join-board-button {
+  margin-left: 30px;
+  padding: 12px 24px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.BoardList .join-board-button:hover {
+  background: #218838;
+}

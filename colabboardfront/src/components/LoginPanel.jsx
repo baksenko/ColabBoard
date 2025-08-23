@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import './LoginPanel.css';
 
-const LoginPanel = ({ onLogin, onSwitchToRegister, onCancel }) => {
+export default function LoginPanel({ onLogin, onSwitchToRegister }) {
+
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
+
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,7 +17,6 @@ const LoginPanel = ({ onLogin, onSwitchToRegister, onCancel }) => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -24,31 +25,9 @@ const LoginPanel = ({ onLogin, onSwitchToRegister, onCancel }) => {
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
-    } else if (formData.username.trim().length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
-    }
-    
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
+
 
     setIsLoading(true);
     try {
@@ -63,7 +42,7 @@ const LoginPanel = ({ onLogin, onSwitchToRegister, onCancel }) => {
 
       const data = await response.json();
 
-             if (!response.ok) {
+      if (!response.ok) {
          if (data.errors) {
            const serverErrors = {};
            Object.keys(data.errors).forEach(key => {
@@ -80,14 +59,14 @@ const LoginPanel = ({ onLogin, onSwitchToRegister, onCancel }) => {
 
        if (data.token) {
          localStorage.setItem('jwt_token', data.token);
-         onLogin({ ...formData, token: data.token });
+         onLogin(formData);
        } else {
          setErrors({ general: 'Login successful but no token received.' });
          return;
        }
     } catch (error) {
       console.error('Login error:', error);
-      setErrors({ general: 'Network error. Please check your connection and try again.' });
+      setErrors({ general: 'Unlucky' });
     } finally {
       setIsLoading(false);
     }
@@ -96,14 +75,6 @@ const LoginPanel = ({ onLogin, onSwitchToRegister, onCancel }) => {
   return (
     <div className="auth-panel">
       <div className="auth-container">
-        <button 
-          className="cancel-button-x" 
-          onClick={onCancel}
-          type="button"
-          aria-label="Close form"
-        >
-          ×
-        </button>
         <h2>Welcome Back</h2>
         <p className="auth-subtitle">Sign in to your ColabBoard account</p>
         
@@ -170,5 +141,3 @@ const LoginPanel = ({ onLogin, onSwitchToRegister, onCancel }) => {
     </div>
   );
 };
-
-export default LoginPanel; 

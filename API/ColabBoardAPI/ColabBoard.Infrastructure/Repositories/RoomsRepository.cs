@@ -22,7 +22,8 @@ public class RoomsRepository : IRoomsRepository
     public async Task<Room?> GetRoomByIdAsync(Guid id)
     {
         return  await _context.Set<Room>()
-            .AsNoTracking()
+            .Include(x => x.Users)
+            .Include(x => x.Strokes)
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
     }
@@ -30,7 +31,7 @@ public class RoomsRepository : IRoomsRepository
     public async Task<Room?> GetRoomByNameAsync(string name)
     {
         return  await _context.Set<Room>()
-            .AsNoTracking()
+            .Include(x => x.Users)
             .Where(x => x.Name == name)
             .FirstOrDefaultAsync();
          
@@ -40,6 +41,7 @@ public class RoomsRepository : IRoomsRepository
     {
         var rooms = await _context.Set<Room>()
             .AsNoTracking()
+            .Include(x => x.Users)
             .ToListAsync();
          
         return rooms;
@@ -47,6 +49,9 @@ public class RoomsRepository : IRoomsRepository
      
     public async Task<Room> CreateRoomAsync(Room room)
     {
+
+        _context.AttachRange(room.Users);
+        
         var entityEntry = await _context.Set<Room>()
             .AddAsync(room);
          
@@ -69,10 +74,15 @@ public class RoomsRepository : IRoomsRepository
     
     public async Task<bool> DeleteRoomAsync(Guid id)
     {
-        var deleted = await _context.Set<Room>()
-            .Where(x => x.Id == id)
-            .ExecuteDeleteAsync();
+        var room = await _context.Set<Room>()
+            .Include(r => r.Users)
+            .FirstOrDefaultAsync(r => r.Id == id);
 
-        return deleted > 0;
+        if (room == null)
+            return false;
+
+        _context.Set<Room>().Remove(room);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

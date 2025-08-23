@@ -32,9 +32,6 @@ namespace ColabBoard.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("HeadID")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -50,17 +47,15 @@ namespace ColabBoard.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Color")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Cordx")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Cordy")
-                        .HasColumnType("integer");
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Size")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -110,6 +105,38 @@ namespace ColabBoard.Infrastructure.Migrations
                         .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsMany("ColabBoard.Domain.Entities.Point", "Cords", b1 =>
+                        {
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<int>("Order")
+                                .HasColumnType("integer");
+
+                            b1.Property<Guid>("StrokeId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<decimal>("x")
+                                .HasColumnType("numeric");
+
+                            b1.Property<decimal>("y")
+                                .HasColumnType("numeric");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("StrokeId", "Order");
+
+                            b1.ToTable("StrokePoints", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("StrokeId");
+                        });
+
+                    b.Navigation("Cords");
 
                     b.Navigation("Room");
                 });

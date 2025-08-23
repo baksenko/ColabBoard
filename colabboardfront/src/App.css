@@ -48,7 +48,6 @@ body, html, #root, .App {
   border-color: #adb5bd;
 }
 
-/* Main Layout */
 main {
   display: flex;
   justify-content: center;

@@ -40,4 +40,46 @@ public class UserService(IUsersRepository usersRepository, HashingService hashin
             throw new Exception("Password is incorrect");
         }
     }
+
+    public async Task<UserDto> GetByNameUserAsync(string username)
+    {
+        var user = await usersRepository.GetUserByUserNameAsync(username);
+        if (user == null)
+        {
+            throw new Exception("user not found");
+        }
+
+        List<string> roomnames = new List<string>();
+
+        if (user.Rooms.Count != 0)
+        {
+            foreach (var room in user.Rooms)
+            {
+                roomnames.Add(room.Name);
+            }   
+        }
+        
+        return new UserDto(user.Username, roomnames);
+    }
+    
+    public async Task<UserDto> GetByIdUserAsync(Guid id)
+    {
+        var user = await usersRepository.GetUserByIdAsync(id);
+        if (user == null)
+        {
+            throw new Exception("user not found");
+        }
+
+        List<string> roomnames = new List<string>();
+
+        if (user.Rooms.Count != 0)
+        {
+            foreach (var room in user.Rooms)
+            {
+                roomnames.Add(room.Name);
+            }   
+        }
+        
+        return new UserDto(user.Username, roomnames);
+    }
 }

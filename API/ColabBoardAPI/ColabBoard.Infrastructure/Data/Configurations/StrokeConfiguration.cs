@@ -13,5 +13,14 @@ public class StrokeConfiguration : IEntityTypeConfiguration<Stroke>
         builder.HasOne(x => x.Room)
             .WithMany(x => x.Strokes);
 
+        builder.OwnsMany(s => s.Cords, a =>
+        {
+            a.WithOwner().HasForeignKey("StrokeId");
+            a.Property<int>("Id");
+            a.HasKey("Id");
+            a.Property(p => p.Order).IsRequired();
+            a.HasIndex("StrokeId", nameof(Point.Order));
+            a.ToTable("StrokePoints");
+        });
     }
 }

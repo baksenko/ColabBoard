@@ -63,8 +63,8 @@
 }
 
 .WhiteboardContainer .eraser-button.active {
-  background: #ffc914;
-  border: 2px solid #2d3a4b;
+  background: #c1340a;
+  border: 1px solid #2d3a4b;
 }
 
 .whiteboard-canvas {
@@ -73,4 +73,28 @@
   touch-action: none;
   border-radius: 12px;
   box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-} 
+}
+
+.clear-button{
+  background: #e3eafc;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.color-picker {
+  background: var(--color);
+  border: 1px solid #ccc;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.color-picker:active {
+  border: 2px solid #2d3a4b;
+}

@@ -1,19 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
-using ColabBoard.Domain.Enums;
 
 namespace ColabBoard.Domain.Entities;
 
 public class Stroke : BaseEntity
 {
     [Required]
-    public Colors Color { get; set; }
+    public int Size { get; set; }
     
     [Required]
-    public int Cordx { get; set; }
+    public string Color { get; set; }
     
     [Required]
-    public int Cordy { get; set; }
+    public List<Point> Cords { get; set;}
     
     [Required]
     public Room Room { get; set; }

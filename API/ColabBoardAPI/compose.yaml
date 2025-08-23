@@ -1,16 +1,4 @@
 ﻿services:
-  colabboard.frontend:
-    image: colabboard.frontend
-    build:
-      context: ../../colabboardfront
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - colabboard.web
-    networks:
-      - colabboard-network
-
   colabboard.web:
     image: colabboard.web
     build:

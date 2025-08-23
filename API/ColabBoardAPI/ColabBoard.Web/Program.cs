@@ -9,8 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => 
@@ -30,15 +28,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options => 
     options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:3000")
         .AllowAnyMethod()
-        .AllowAnyHeader())
+        .AllowAnyHeader()
+        .AllowCredentials())
     );
-
 
 
 var app = builder.Build();
 
 
-app.MapHub<WhiteBoardHub>("board");
+app.UseCors();
+app.MapHub<WhiteBoardHub>("/whiteboardHub");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -46,10 +46,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

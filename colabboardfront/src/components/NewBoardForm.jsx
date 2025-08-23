@@ -1,14 +1,38 @@
 import React, { useState } from "react";
 import './NewBoardForm.css';
 
-const NewBoardForm = ({ onCreate, onCancel }) => {
+export default function NewBoardForm({onCreate, onCancel}) {
+
+  const [errors, setErrors] = useState({});
   const [boardName, setBoardName] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (boardName.trim() && password.trim()) {
-      onCreate({ boardName, password });
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('Name', boardName);
+      formDataToSend.append('Password', password);
+
+      const response = await fetch('http://localhost:8080/Board/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+        },
+        body: formDataToSend
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const newBoard = {Name: data.name, Id: data.id};
+        onCreate(newBoard);
+        console.log('New board created:', newBoard);
+      } else {
+        const errortext = await response.text();
+        setErrors({general: errortext || "unlucky"});
+      }
+
       setBoardName("");
       setPassword("");
     }
@@ -27,6 +51,11 @@ const NewBoardForm = ({ onCreate, onCancel }) => {
       <h2>Create New Whiteboard</h2>
       
       <form onSubmit={handleSubmit}>
+        {errors.general && (
+            <div className="error-message general-error">
+              {errors.general}
+            </div>
+        )}
         <div className="form-group">
           <label>
             Board Name:
@@ -68,5 +97,3 @@ const NewBoardForm = ({ onCreate, onCancel }) => {
     </div>
   );
 };
-
-export default NewBoardForm;

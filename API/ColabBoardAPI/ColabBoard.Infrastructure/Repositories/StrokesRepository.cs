@@ -1,69 +1,31 @@
-﻿using ColabBoard.Application.DTOs;
-using ColabBoard.Application.Interfaces;
+﻿using ColabBoard.Application.Interfaces;
 using ColabBoard.Domain.Entities;
 using ColabBoard.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace ColabBoard.Infrastructure.Repositories;
 
-public class StrokesRepository: IStrokesRepository
+public class StrokesRepository(AppDbContext context) : IStrokesRepository
 {
-    private readonly AppDbContext _context;
-
-    public StrokesRepository(AppDbContext context)
+    public async Task CreateStrokeAsync(Stroke stroke)
     {
-        _context = context;
+        await context.Set<Stroke>()
+            .AddAsync(stroke);
+
+        await context.SaveChangesAsync();
     }
-
-    public async Task<List<Stroke>?> GetStrokesByRoomIdAsync(Guid roomId)
+    
+    public async Task DeleteStrokesAsync(Guid roomId, decimal x, decimal y)
     {
-        var room = await _context
-            .Set<Room>()
-            .AsNoTracking()
-            .Where(x => x.Id == roomId)
-            .FirstOrDefaultAsync();
-        
-        return room?.Strokes;
-    }
+        var strokes = await context.Set<Stroke>()
+            .Where(stroke => stroke.Room.Id == roomId)
+            .ToListAsync();
 
-    public async Task<Stroke> CreateStrokeAsync(CreateStrokeDto stroke)
-    {
-        var roomid = stroke.room_id;
-        
-        var room = await _context
-            .Set<Room>()
-            .AsNoTracking()
-            .Where(x => x.Id == roomid)
-            .FirstOrDefaultAsync();
-
-        var new_stroke = new Stroke()
+        foreach (var stroke in strokes)
         {
-            Color = stroke.color,
-            Cordx = stroke.x,
-            Cordy = stroke.y,
-            Room = room
-        };
-        
-        room.Strokes.Add(new_stroke);
-        await _context.SaveChangesAsync();
+            stroke.Cords.RemoveAll(point => Math.Abs(point.x - x) < 25 && Math.Abs(point.y - y) < 25);
+        }
 
-        return new_stroke;
-    }
-
-    public async Task<bool> DeleteStrokeAsync(Guid room_id, int cordx, int cordy)
-    {
-        var room = await _context
-            .Set<Room>()
-            .AsNoTracking()
-            .Where(x => x.Id == room_id)
-            .FirstOrDefaultAsync();
-
-        bool removed = room
-            .Strokes
-            .RemoveAll(x => x.Cordx == cordx && x.Cordy == cordy) > 0;
-        
-        await _context.SaveChangesAsync();
-        
-        return removed;
+        await context.SaveChangesAsync();
     }
 }

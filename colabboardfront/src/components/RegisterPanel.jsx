@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import './RegisterPanel.css';
 
-const RegisterPanel = ({ onRegister, onSwitchToLogin, onCancel }) => {
+export default function RegisterPanel({ onRegister, onSwitchToLogin }) {
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
     confirmPassword: ''
   });
+
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -16,7 +18,6 @@ const RegisterPanel = ({ onRegister, onSwitchToLogin, onCancel }) => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -27,8 +28,6 @@ const RegisterPanel = ({ onRegister, onSwitchToLogin, onCancel }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
-
     
     if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
@@ -70,17 +69,7 @@ const RegisterPanel = ({ onRegister, onSwitchToLogin, onCancel }) => {
         body: formDataToSend
       });
 
-      // Check if response has content and is JSON
-      let data = null;
-      const contentType = response.headers.get('content-type');
-      
-      if (contentType && contentType.includes('application/json')) {
-        try {
-          data = await response.json();
-        } catch (error) {
-          console.error('Failed to parse JSON response:', error);
-        }
-      }
+      const data = await response.json();
 
       if (!response.ok) {
         if (data && data.errors) {
@@ -92,34 +81,26 @@ const RegisterPanel = ({ onRegister, onSwitchToLogin, onCancel }) => {
         } else if (data && data.message) {
           setErrors({ general: data.message });
         } else {
-          // Handle non-JSON error responses
           const errorText = await response.text();
           setErrors({ general: errorText || 'Registration failed. Please try again.' });
         }
         return;
       }
 
-      // Registration successful
-      onRegister(formData);
+      onRegister();
+
     } catch (error) {
       console.error('Registration error:', error);
       setErrors({ general: 'Network error. Please check your connection and try again.' });
     } finally {
       setIsLoading(false);
+      onSwitchToLogin();
     }
   };
 
   return (
     <div className="auth-panel">
       <div className="auth-container">
-        <button 
-          className="cancel-button-x" 
-          onClick={onCancel}
-          type="button"
-          aria-label="Close form"
-        >
-          ×
-        </button>
         <h2>Create Account</h2>
         <p className="auth-subtitle">Join ColabBoard to start collaborating</p>
         
@@ -203,5 +184,3 @@ const RegisterPanel = ({ onRegister, onSwitchToLogin, onCancel }) => {
     </div>
   );
 };
-
-export default RegisterPanel; 
