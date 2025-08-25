@@ -22,7 +22,8 @@ export default function App() {
         id: null,
         name: null,
         users: [],
-        strokes: []
+        strokes: [],
+        activeUsers: []
       });
   const [showBoardList, setShowBoardList] = React.useState(true);
 
@@ -32,11 +33,18 @@ export default function App() {
     }
   };
 
+  const GetActiveUsers = (users) => {
+    setBoard(prevBoard => ({
+      ...prevBoard,
+      activeUsers: users
+    }));
+  };
+
   async function joinBoard(boardId) {
     const token = localStorage.getItem("jwt_token");
 
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`http://localhost:8080/whiteboardHub?boardId=${boardId}`, {
+      .withUrl(`http://localhost:8080/whiteboardHub?boardId=${boardId}&username=${user.username}`, {
         accessTokenFactory: () => token
       })
       .withAutomaticReconnect()
@@ -45,10 +53,10 @@ export default function App() {
       
       connection.on("ReceiveStroke", onStrokeReceived);
       connection.on("RemoveStrokes", removeStrokes);
+      connection.on("GetActiveUsers", GetActiveUsers);
 
     try{
       await connection.start();
-      console.log(connection);
       setConnection(connection);
     } catch (error) {
       console.error("Error starting connection:", error);
@@ -102,16 +110,12 @@ export default function App() {
 
     if (response.ok) {
       const data = await response.json();
-      console.log('strokes:', data.strokes);
-      console.log('id:', data.id);
       setBoard({
         id: data.id,
         name: data.name,
         users: data.userNames || [],
         strokes: data.strokes || []
       });
-      console.log('Board loaded:', board.strokes);
-      console.log('Users:', board.users);
     } else {
       console.error('Failed to load board info');
     }
@@ -145,6 +149,9 @@ export default function App() {
 
 
   const handleLogout = () => {
+    if (connection) {
+      connection.stop();
+    }
     localStorage.removeItem("jwt-token");
     setUser(null);
     setAuthenticated(false);
@@ -163,6 +170,7 @@ export default function App() {
   const onCreateBoard = (newBoard) => {
     setBoards([...boards, newBoard]);
     setShowBoardPanel(false);
+    setShowBoardList(true);
   }
 
   const onDeleteBoard = async (boardId) => {

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import UsersList from './UsersList';
 import './WhiteboardCanvas.css';
 
 const DEFAULT_THICKNESS = 3;
@@ -89,6 +90,7 @@ const WhiteboardCanvas = ({ClearStrokes, board, onDraw, onLeave }) => {
   };
 
   const startDraw = (pos) => {
+    console.log('Board:', board);
     drawingRef.current = true;
     lastPointRef.current = pos;
     ctxRef.current.beginPath();
@@ -122,6 +124,7 @@ const WhiteboardCanvas = ({ClearStrokes, board, onDraw, onLeave }) => {
 
   return (
     <>
+    <div className="WhiteboardWrapper">
       <div className="WhiteboardContainer">
         <button className="back-button" onClick={onLeave}>Back to Boards</button>
         <div className="controls">
@@ -170,14 +173,9 @@ const WhiteboardCanvas = ({ClearStrokes, board, onDraw, onLeave }) => {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         />
+        </div>
+        <UsersList users={board.users} activeUsers={board.activeUsers} />
       </div>
-      <ul>
-        {board.users.map((user, idx) => (
-          <li key={idx} className="user-item">
-            <span className="user-name">{user}</span>
-          </li>
-        ))}
-      </ul>
     </>
   );
 };
