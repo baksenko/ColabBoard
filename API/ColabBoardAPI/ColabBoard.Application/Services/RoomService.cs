@@ -5,7 +5,7 @@ using ColabBoard.Domain.Entities;
 
 namespace ColabBoard.Application.Services;
 
-public class RoomService(IRoomsRepository roomsRepository, HashingService hashingService, IStrokesRepository strokesRepository)
+public class RoomService(IRoomsRepository roomsRepository, HashingService hashingService, IStrokesRepository strokesRepository, SymbolRecognitionService recognitionService)
 {
     public async Task<RoomDto> CreateRoomAsync(string name, string password, User user)
     {
@@ -100,7 +100,7 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
     }
     
     
-    public async Task AddStroke(CreateStrokeDto stroke)
+    public async Task<HttpResponseMessage?> AddStroke(CreateStrokeDto stroke)
     {
         var room = await roomsRepository.GetRoomByIdAsync(stroke.Roomid);
 
@@ -108,6 +108,9 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
 
         if (!stroke.IsErasing)
         {
+
+           //return await recognitionService.Recognise(stroke);
+            
             var stroke_ = new Stroke
             {
                 Cords = stroke.Points.Select((p, i) => new Point { x = p.x, y = p.y, Order = i })
@@ -127,6 +130,8 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
                 await strokesRepository.DeleteStrokesAsync(room.Id, point.x, point.y);
             }
         }
+
+        return null;
     }
 
     public async Task DelteStrokesAsync(Guid roomid)

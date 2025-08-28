@@ -1,14 +1,13 @@
-/* Global Styles */
 body, html, #root, .App {
-  background: #f4f6fa;
+  background: #d9dce2;
   min-height: 100vh;
   margin: 0;
   font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
 }
 
-/* Header Styles */
+
 .App-header {
-  background: #fff;
+  background: #eeeaea;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   display: flex;
   justify-content: space-between;

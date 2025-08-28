@@ -74,7 +74,7 @@ public class WhiteBoardHub(RoomService roomService, UserService userService) : H
     
     public async Task SendStroke(CreateStrokeDto stroke)
     {
-        await roomService.AddStroke(stroke);
+        var result = await roomService.AddStroke(stroke);
         await Clients.Group(stroke.Roomid.ToString()).SendAsync("ReceiveStroke", stroke);
     }
 }

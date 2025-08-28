@@ -31,6 +31,24 @@ export default function App() {
     if (connection) {
       await connection.invoke("SendStroke", stroke);
     }
+     /*
+     console.log(stroke);
+    const response = await fetch("http://localhost:8000/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ strokes: stroke.points })
+    });
+
+    if (!response.ok) {
+      console.error("Failed to send stroke");
+    }
+    else {
+      const data = await response.json();
+      console.log("Stroke sent successfully:", data);
+    }
+      */
   };
 
   const GetActiveUsers = (users) => {
@@ -39,6 +57,10 @@ export default function App() {
       activeUsers: users
     }));
   };
+
+  const recognition_test = (response) =>{
+    console.log(response);
+  }
 
   async function joinBoard(boardId) {
     const token = localStorage.getItem("jwt_token");
@@ -54,6 +76,7 @@ export default function App() {
       connection.on("ReceiveStroke", onStrokeReceived);
       connection.on("RemoveStrokes", removeStrokes);
       connection.on("GetActiveUsers", GetActiveUsers);
+      connection.on("RecognitionTest", recognition_test);
 
     try{
       await connection.start();
@@ -92,9 +115,9 @@ export default function App() {
     }));
   };
 
-  const handleBoardSelect = (boardId) => {
-    loadboardinfo(boardId);
-    joinBoard(boardId);
+  const handleBoardSelect = async (boardId) => {
+    await loadboardinfo(boardId);
+    await joinBoard(boardId);
     setShowBoard(true);
     setShowBoardList(false);
   }
