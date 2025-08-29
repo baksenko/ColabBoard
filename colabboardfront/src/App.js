@@ -168,6 +168,7 @@ export default function App() {
   const onJoinBoard = (newBoard) => {
     setBoards([...boards, newBoard]);
     setShowJoinBoardForm(false);
+    handleBoardSelect(newBoard.Id);
   }
 
 

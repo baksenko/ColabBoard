@@ -73,7 +73,6 @@ public class UsersRepository : IUsersRepository
      public async Task<User?> GetUserByIdAsync(Guid id)
      {
          return await _context.Set<User>()
-             .AsNoTracking()
              .Where(x => x.Id == id)
              .Include(x => x.Rooms)
              .FirstOrDefaultAsync();

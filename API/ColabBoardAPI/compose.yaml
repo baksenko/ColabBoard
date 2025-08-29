@@ -25,7 +25,18 @@
       - db_data:/var/lib/postgresql/data
     networks:
       - colabboard-network
-        
+  
+  colabboard.frontend:
+    image: colabboard.frontend
+    build:
+      context: ../../colabboardfront
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - colabboard.web
+    networks:
+      - colabboard-network
   
 volumes:
   db_data:

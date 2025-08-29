@@ -5,7 +5,7 @@ using ColabBoard.Domain.Entities;
 
 namespace ColabBoard.Application.Services;
 
-public class RoomService(IRoomsRepository roomsRepository, HashingService hashingService, IStrokesRepository strokesRepository, SymbolRecognitionService recognitionService)
+public class RoomService(IRoomsRepository roomsRepository, HashingService hashingService, IStrokesRepository strokesRepository)
 {
     public async Task<RoomDto> CreateRoomAsync(string name, string password, User user)
     {
@@ -108,8 +108,6 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
 
         if (!stroke.IsErasing)
         {
-
-           //return await recognitionService.Recognise(stroke);
             
             var stroke_ = new Stroke
             {

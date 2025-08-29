@@ -20,7 +20,6 @@ builder.Services.AddSingleton<HashingService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddSingleton<AuthenticationService>();
 builder.Services.AddScoped<RoomService>();
-builder.Services.AddScoped<SymbolRecognitionService>();
 builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
 builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddSignalR();
