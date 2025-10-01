@@ -21,7 +21,7 @@
       POSTGRES_PASSWORD: pisyapopakaka
       POSTGRES_DB: ColabBoardDb
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U myuser" ]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d ColabBoardDb" ]
       interval: 10s
       timeout: 5s
       retries: 5
