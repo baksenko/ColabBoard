@@ -30,7 +30,8 @@ A real-time collaborative whiteboard application that allows multiple users to d
 2. Navigate to the project root directory
 3. Run the application using Docker Compose:
 ```bash
-docker-compose up --build
+cd API\ColabBoardAPI
+docker-compose up -d
 ```
 
 The application will be available at:
