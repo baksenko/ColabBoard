@@ -7,25 +7,35 @@ namespace ColabBoard.Infrastructure.Repositories;
 
 public class StrokesRepository(AppDbContext context) : IStrokesRepository
 {
-    public async Task CreateStrokeAsync(Stroke stroke)
+    public async Task UpsertStrokeAsync(Stroke stroke)
     {
-        await context.Set<Stroke>()
-            .AddAsync(stroke);
+        var existingStroke = await context.Set<Stroke>()
+            .Include(s => s.Room)
+            .FirstOrDefaultAsync(s => s.ElementId == stroke.ElementId && s.Room.Id == stroke.Room.Id);
 
-        await context.SaveChangesAsync();
-    }
-    
-    public async Task DeleteStrokesAsync(Guid roomId, decimal x, decimal y)
-    {
-        var strokes = await context.Set<Stroke>()
-            .Where(stroke => stroke.Room.Id == roomId)
-            .ToListAsync();
-
-        foreach (var stroke in strokes)
+        if (existingStroke != null)
         {
-            stroke.Cords.RemoveAll(point => Math.Abs(point.x - x) < 25 && Math.Abs(point.y - y) < 25);
+            existingStroke.ElementAttributes = stroke.ElementAttributes;
+            context.Set<Stroke>().Update(existingStroke);
+        }
+        else
+        {
+            await context.Set<Stroke>().AddAsync(stroke);
         }
 
         await context.SaveChangesAsync();
+    }
+
+    public async Task DeleteStrokeAsync(string elementId, Guid roomId)
+    {
+        var stroke = await context.Set<Stroke>()
+            .Include(s => s.Room)
+            .FirstOrDefaultAsync(s => s.ElementId == elementId && s.Room.Id == roomId);
+
+        if (stroke != null)
+        {
+            context.Set<Stroke>().Remove(stroke);
+            await context.SaveChangesAsync();
+        }
     }
 }

@@ -11,16 +11,10 @@ public class StrokeConfiguration : IEntityTypeConfiguration<Stroke>
         builder.HasKey(x => x.Id);
 
         builder.HasOne(x => x.Room)
-            .WithMany(x => x.Strokes);
+            .WithMany(x => x.Strokes)
+            .OnDelete(DeleteBehavior.Cascade); // Ensure strokes are deleted when room is deleted
 
-        builder.OwnsMany(s => s.Cords, a =>
-        {
-            a.WithOwner().HasForeignKey("StrokeId");
-            a.Property<int>("Id");
-            a.HasKey("Id");
-            a.Property(p => p.Order).IsRequired();
-            a.HasIndex("StrokeId", nameof(Point.Order));
-            a.ToTable("StrokePoints");
-        });
+        builder.Property(x => x.ElementId).IsRequired();
+        builder.Property(x => x.ElementAttributes).HasColumnType("jsonb").IsRequired();
     }
 }

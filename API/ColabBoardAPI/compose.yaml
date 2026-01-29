@@ -7,14 +7,14 @@
     ports:
       - "8080:8080"  
     depends_on:
-      postgresdb:
+      colab_board_db:
         condition: service_healthy
     networks:
       - colabboard-network
 
-  postgresdb:
-    image: postgres:latest
-    container_name: postgres_db
+  colab_board_db:
+    image: postgres:17
+    container_name: colab-board-db
     restart: always
     environment:
       POSTGRES_USER: admin
@@ -29,18 +29,6 @@
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-    networks:
-      - colabboard-network
-  
-  colabboard.frontend:
-    image: colabboard.frontend
-    build:
-      context: ../../colabboardfront
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - colabboard.web
     networks:
       - colabboard-network
   

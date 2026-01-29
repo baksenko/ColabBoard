@@ -9,7 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options => {
+    options.MaximumReceiveMessageSize = 32 * 1024 * 1024; // 32MB
+    options.EnableDetailedErrors = true;
+});
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => 
     options.UseNpgsql(builder.Configuration.GetConnectionString("postgres")));
@@ -22,11 +26,10 @@ builder.Services.AddSingleton<AuthenticationService>();
 builder.Services.AddScoped<RoomService>();
 builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
 builder.Services.AddAuth(builder.Configuration);
-builder.Services.AddSignalR();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options => 
-    options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:3000")
+    options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:5173")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials())

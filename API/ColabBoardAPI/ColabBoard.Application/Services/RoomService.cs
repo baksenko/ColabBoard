@@ -32,7 +32,7 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
         {
             names.Add(user_.Username);
         }
-        return new RoomDto(entity.Id, entity.Name, names, new List<strokeDTO>());
+        return new RoomDto(entity.Id, entity.Name, names, new List<StrokeDto>());
     }
 
     public async Task DeleteUserFromRoomAsync(string roomId, string userId)
@@ -70,7 +70,7 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
                     room.Id,
                     room.Name,
                     room.Users.Select(x => x.Username).ToList(),
-                    new List<strokeDTO>()));
+                    new List<StrokeDto>()));
             }
         }
         
@@ -91,7 +91,7 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
             room.Users.Add(user);
             await roomsRepository.UpdateRoomAsync(room);
             
-            return new RoomDto(room.Id, room.Name, room.Users.Select(x => x.Username).ToList(), new List<strokeDTO>());
+            return new RoomDto(room.Id, room.Name, room.Users.Select(x => x.Username).ToList(), new List<StrokeDto>());
         }
         else
         {
@@ -102,37 +102,23 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
     
     public async Task<HttpResponseMessage?> AddStroke(CreateStrokeDto stroke)
     {
-        var room = await roomsRepository.GetRoomByIdAsync(stroke.Roomid);
+        var room = await roomsRepository.GetRoomByIdAsync(stroke.RoomId);
 
         if (room == null) throw new Exception("room not found");
 
-        if (!stroke.IsErasing)
+        var stroke_ = new Stroke
         {
-            
-            var stroke_ = new Stroke
-            {
-                Cords = stroke.Points.Select((p, i) => new Point { x = p.x, y = p.y, Order = i })
-                    .ToList(),
-                Color = stroke.Color,
-                Size = stroke.Size,
-                Room = room
-            };
-            
-            await strokesRepository.CreateStrokeAsync(stroke_);
-        }
+            ElementId = stroke.ElementId,
+            ElementAttributes = stroke.ElementAttributes,
+            Room = room
+        };
         
-        else
-        {
-            foreach (var point in stroke.Points)
-            {
-                await strokesRepository.DeleteStrokesAsync(room.Id, point.x, point.y);
-            }
-        }
+        await strokesRepository.UpsertStrokeAsync(stroke_);
 
         return null;
     }
 
-    public async Task DelteStrokesAsync(Guid roomid)
+    public async Task DeleteStrokesAsync(Guid roomid)
     {
         var room = await roomsRepository.GetRoomByIdAsync(roomid);
         if (room == null)
@@ -143,4 +129,9 @@ public class RoomService(IRoomsRepository roomsRepository, HashingService hashin
         room.Strokes.Clear();
         await roomsRepository.UpdateRoomAsync(room);
     }
-}   
+
+    public async Task RemoveStroke(string elementId, Guid roomId)
+    {
+        await strokesRepository.DeleteStrokeAsync(elementId, roomId);
+    }
+}

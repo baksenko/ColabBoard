@@ -1,4 +1,0 @@
-tensorflow
-numpy
-tensorflow_datasets
-grpcio

@@ -115,16 +115,10 @@ public class BoardController(
         try
         {
             var room = await roomsRepository.GetRoomByIdAsync(Guid.Parse(boarId));
+            
+            if (room == null) return NotFound();
 
-            var strokes = room.Strokes
-                .Select(s => new strokeDTO(
-                    s.Size,
-                    s.Color,
-                    s.Cords
-                        .OrderBy(p => p.Order)
-                        .Select(p => new PointDto(p.x, p.y))
-                        .ToList()
-                ));
+            var strokes = room.Strokes.Select(s => new StrokeDto(s));
             
             return Ok(new RoomDto(room.Id,
                 room.Name,
@@ -146,7 +140,7 @@ public class BoardController(
         {
             if (delete)
             {
-               await roomService.DelteStrokesAsync(boardid);
+               await roomService.DeleteStrokesAsync(boardid);
             }
             return Ok();
         }

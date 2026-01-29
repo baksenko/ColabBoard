@@ -1,0 +1,103 @@
+.toolbox {
+    position: fixed;
+    top: 50%;
+    /* Center vertically */
+    left: 10px;
+    transform: translateY(-50%);
+    background-color: var(--primary-bg-color);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px var(--shadow-color),
+        0 2px 4px -1px var(--shadow-color);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 280px;
+}
+
+.toolbox-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toolbox-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--secondary-text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.color-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.color-swatch {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s, border-color 0.1s;
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+    z-index: 1;
+}
+
+.color-swatch.selected {
+    border-color: var(--highlight-color);
+    box-shadow: 0 0 0 2px var(--primary-bg-color), 0 0 0 4px var(--highlight-color);
+}
+
+.color-input {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.stroke-width-picker {
+    display: flex;
+    gap: 8px;
+    background-color: var(--secondary-bg-color);
+    padding: 6px;
+    border-radius: 8px;
+}
+
+.width-btn {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--secondary-text-color);
+}
+
+.width-btn:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.width-btn.selected {
+    background-color: var(--primary-bg-color);
+    color: var(--primary-text-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.opacity-slider {
+    width: 100%;
+    cursor: pointer;
+}

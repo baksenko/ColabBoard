@@ -2,4 +2,14 @@
 
 namespace ColabBoard.Application.DTOs;
 
-public record strokeDTO(int Size, string Color, List<PointDto> Points);
+public class StrokeDto
+{
+    public string ElementId { get; set; }
+    public string ElementAttributes { get; set; }
+
+    public StrokeDto(Stroke stroke)
+    {
+        ElementId = stroke.ElementId;
+        ElementAttributes = stroke.ElementAttributes;
+    }
+}

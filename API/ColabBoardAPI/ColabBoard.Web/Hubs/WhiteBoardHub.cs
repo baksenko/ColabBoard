@@ -61,20 +61,43 @@ public class WhiteBoardHub(RoomService roomService, UserService userService) : H
             {
                 await Clients.Group(boardId).SendAsync("GetActiveUsers", _activeUsers[boardId]);
             }
+            
+            await Clients.OthersInGroup(boardId).SendAsync("RemoveCursor", Context.ConnectionId);
 
             await base.OnDisconnectedAsync(exception);
+        }
+    }
+    
+    public async Task SendCursorPosition(string roomId, double x, double y)
+    {
+         if (_connections.TryGetValue(Context.ConnectionId, out var info))
+        {
+            await Clients.OthersInGroup(roomId).SendAsync("ReceiveCursorPosition", Context.ConnectionId, info.Username, x, y);
         }
     }
 
     public async Task ClearBoard(Guid boardid)
     {
-        await roomService.DelteStrokesAsync(boardid);
+        await roomService.DeleteStrokesAsync(boardid);
         await Clients.Group(boardid.ToString()).SendAsync("RemoveStrokes");
     }
     
-    public async Task SendStroke(CreateStrokeDto stroke)
+    public async Task SendElement(CreateStrokeDto element)
     {
-        var result = await roomService.AddStroke(stroke);
-        await Clients.Group(stroke.Roomid.ToString()).SendAsync("ReceiveStroke", stroke);
+        // Save to DB
+        await roomService.AddStroke(element);
+        
+        // Broadcast to others (exclude sender to avoid echo, optional depending on frontend logic)
+        // With optimistic UI, exclude sender is standard.
+        await Clients.OthersInGroup(element.RoomId.ToString()).SendAsync("ReceiveElement", element);
+    }
+
+    public async Task DeleteElement(string elementId, string roomId)
+    {
+        if (Guid.TryParse(roomId, out var roomGuid))
+        {
+            await roomService.RemoveStroke(elementId, roomGuid);
+            await Clients.OthersInGroup(roomId).SendAsync("RemoveElement", elementId);
+        }
     }
 }
