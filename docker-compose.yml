@@ -1,0 +1,54 @@
+services:
+  backend:
+    image: colabboard-backend
+    build:
+      context: ./API/ColabBoardAPI
+      dockerfile: ColabBoard.Web/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      colab_board_db:
+        condition: service_healthy
+    networks:
+      - colabboard-network
+
+  frontend:
+    image: colabboard-frontend
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost:8080
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - colabboard-network
+
+  colab_board_db:
+    image: postgres:17
+    container_name: colab-board-db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: pisyapopakaka
+      POSTGRES_DB: ColabBoardDb
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d ColabBoardDb" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - colabboard-network
+
+volumes:
+  db_data:
+
+networks:
+  colabboard-network:
+    driver: bridge

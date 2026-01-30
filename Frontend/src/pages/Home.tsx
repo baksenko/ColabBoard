@@ -228,7 +228,7 @@ export default function Home() {
                         />
                         <TextField
                             margin="dense"
-                            label="Password (Optional)"
+                            label="Password"
                             type="password"
                             fullWidth
                             variant="outlined"

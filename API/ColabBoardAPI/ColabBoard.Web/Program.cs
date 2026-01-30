@@ -29,7 +29,7 @@ builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options => 
-    options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:5173")
+    options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:3000")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials())
