@@ -29,7 +29,7 @@ builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options => 
-    options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:3000")
+    options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:3000", "https://colab-board-tau.vercel.app")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials())
