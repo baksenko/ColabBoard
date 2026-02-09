@@ -30,8 +30,7 @@ export default function Home() {
                 handleLogout();
             });
         } else {
-            // Redirect if no token immediately, though PrivateRoute handles this usually
-            navigate('/login');
+            setLoading(false);
         }
     }, [token]);
 
@@ -101,14 +100,35 @@ export default function Home() {
                             ColabBoard
                         </Typography>
 
-                        <Button
-                            color="inherit"
-                            onClick={handleLogout}
-                            startIcon={<FiLogOut />}
-                            style={{ fontWeight: 500, color: '#666' }}
-                        >
-                            Logout
-                        </Button>
+                        {token ? (
+                            <Button
+                                color="inherit"
+                                onClick={handleLogout}
+                                startIcon={<FiLogOut />}
+                                style={{ fontWeight: 500, color: '#666' }}
+                            >
+                                Logout
+                            </Button>
+                        ) : (
+                            <Box>
+                                <Button
+                                    color="inherit"
+                                    onClick={() => navigate('/login')}
+                                    startIcon={<FiLogIn />}
+                                    style={{ fontWeight: 500, color: '#666', marginRight: '10px' }}
+                                >
+                                    Login
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    className="btn-primary"
+                                    onClick={() => navigate('/register')}
+                                    style={{ fontWeight: 500 }}
+                                >
+                                    Register
+                                </Button>
+                            </Box>
+                        )}
                     </Toolbar>
                 </Container>
             </AppBar>
@@ -134,7 +154,7 @@ export default function Home() {
                             variant="outlined"
                             className="btn-secondary"
                             startIcon={<FiLogIn />}
-                            onClick={() => setOpenJoin(true)}
+                            onClick={() => token ? setOpenJoin(true) : navigate('/login')}
                         >
                             Join Board
                         </Button>
@@ -142,7 +162,7 @@ export default function Home() {
                             variant="contained"
                             className="btn-primary"
                             startIcon={<FiPlus />}
-                            onClick={() => setOpenCreate(true)}
+                            onClick={() => token ? setOpenCreate(true) : navigate('/login')}
                         >
                             Create Board
                         </Button>
@@ -150,7 +170,25 @@ export default function Home() {
                 </Box>
 
                 {/* Content Area */}
-                {!loading && boards.length === 0 ? (
+                {!token ? (
+                    <Box className="guest-state" textAlign="center" mt={8}>
+                        <FiLayout size={64} color="#ccc" />
+                        <Typography variant="h5" gutterBottom color="textPrimary" fontWeight="600" mt={2}>
+                            Ready to Collaborate?
+                        </Typography>
+                        <Typography color="textSecondary" mb={4}>
+                            Log in to access your boards and start collaborating with your team.
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            className="btn-primary"
+                            size="large"
+                            onClick={() => navigate('/login')}
+                        >
+                            Login to Continue
+                        </Button>
+                    </Box>
+                ) : !loading && boards.length === 0 ? (
                     <Box className="empty-state">
                         <FiLayout className="empty-icon" />
                         <Typography variant="h5" gutterBottom color="textPrimary" fontWeight="600">
