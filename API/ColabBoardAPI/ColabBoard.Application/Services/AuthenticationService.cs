@@ -1,5 +1,9 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+
 using System.Security.Claims;
+
+using System.Security.Cryptography;
+
 using System.Text;
 using ColabBoard.Domain.Entities;
 using Microsoft.Extensions.Options;
@@ -26,5 +30,13 @@ public class AuthenticationService(IOptions<AuthSettings> authSettings)
         );
         
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 }

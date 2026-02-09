@@ -24,7 +24,7 @@ public class UserService(IUsersRepository usersRepository, HashingService hashin
          await usersRepository.CreateUserAsync(user);
     }
 
-    public async Task<string> LoginAsync(string username, string password)
+    public async Task<AuthResponseDto> LoginAsync(string username, string password)
     {
         var user = await usersRepository.GetUserByUserNameAsync(username);
         if (user == null)
@@ -34,11 +34,39 @@ public class UserService(IUsersRepository usersRepository, HashingService hashin
 
         if (hashingService.VerifyPassword(password, user.HashedPassword))
         {
-            return authenticationService.GenerateJwtToken(user);
+            var token = authenticationService.GenerateJwtToken(user);
+            var refreshToken = authenticationService.GenerateRefreshToken();
+            
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            
+            await usersRepository.UpdateUserAsync(user);
+
+            return new AuthResponseDto(token, refreshToken);
         }
+        else
         {
             throw new Exception("Password is incorrect");
         }
+    }
+
+    public async Task<AuthResponseDto> RefreshTokenAsync(string username, string refreshToken)
+    {
+        var user = await usersRepository.GetUserByUserNameAsync(username);
+        if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        {
+            throw new Exception("Invalid refresh token");
+        }
+
+        var newToken = authenticationService.GenerateJwtToken(user);
+        var newRefreshToken = authenticationService.GenerateRefreshToken();
+
+        user.RefreshToken = newRefreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        
+        await usersRepository.UpdateUserAsync(user);
+
+        return new AuthResponseDto(newToken, newRefreshToken);
     }
 
     public async Task<UserDto> GetByNameUserAsync(string username)

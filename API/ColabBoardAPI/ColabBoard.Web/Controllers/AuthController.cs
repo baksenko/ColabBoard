@@ -30,8 +30,22 @@ public class AuthController(UserService userService) : ControllerBase
     {
         try
         {
-            var token = await userService.LoginAsync(username, Password);
-            return Ok(new {token});
+            var result = await userService.LoginAsync(username, Password);
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshToken([FromForm] string username, [FromForm] string refreshToken)
+    {
+        try
+        {
+            var result = await userService.RefreshTokenAsync(username, refreshToken);
+            return Ok(result);
         }
         catch (Exception e)
         {

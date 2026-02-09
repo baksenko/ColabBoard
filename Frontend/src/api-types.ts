@@ -1,6 +1,12 @@
+
+export interface AuthResponseDto {
+    accessToken: string;
+    refreshToken: string;
+}
+
 export interface UserDto {
     username: string;
-    token?: string;
+    token?: string; // keeping for compatibility if used elsewhere, but maybe should remove
 }
 
 export interface CreateUserDto {
